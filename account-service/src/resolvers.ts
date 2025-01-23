@@ -1,4 +1,5 @@
 import { Account } from './types';
+import { v4 as uuidv4 } from 'uuid';
 
 //TODO: move this later
 const accounts: Account[] = [
@@ -20,7 +21,7 @@ export const resolvers = {
   },
   Mutation: {
     createAccount: (_: any, { name, email }: Account) => {
-      const account = { id: String(accounts.length + 1), name, email };
+      const account = { id: uuidv4(), name, email };
       accounts.push(account);
       return account;
     },
