@@ -1,7 +1,7 @@
 import { Device } from './types';
 import { v4 as uuidv4 } from 'uuid';
 
-//TODO: move this later
+//TODO: Decide later if default devices should be removed
 const devices: Device[] = [
   {
     id: '1',
@@ -18,6 +18,7 @@ const devices: Device[] = [
 export const resolvers = {
   Query: {
     devices: () => devices,
+    device: (_: any, { id }: { id: string }) => devices.find((device) => device.id === id),
     devicesByAccountId: (_: any, { accountId }: { accountId: string }) =>
       devices.filter((device) => device.accountId === accountId),
   },
