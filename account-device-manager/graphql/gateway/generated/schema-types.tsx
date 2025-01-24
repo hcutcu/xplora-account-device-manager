@@ -65,7 +65,30 @@ export type QueryDeviceArgs = {
   id: Scalars['ID']['input'];
 };
 
+export type GetAccountDevicesQueryVariables = Exact<{
+  accountId: Scalars['ID']['input'];
+}>;
+
+
+export type GetAccountDevicesQuery = { __typename?: 'Query', account?: { __typename?: 'Account', devices: Array<{ __typename?: 'Device', id: string, name: string }> } | null };
+
 export type GetAccountsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetAccountsQuery = { __typename?: 'Query', accounts: Array<{ __typename?: 'Account', id: string, name: string, email: string }> };
+
+export type CreateAccountMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+  email: Scalars['String']['input'];
+}>;
+
+
+export type CreateAccountMutation = { __typename?: 'Mutation', createAccount: { __typename?: 'Account', id: string, name: string, email: string } };
+
+export type CreateDeviceMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+  accountId: Scalars['ID']['input'];
+}>;
+
+
+export type CreateDeviceMutation = { __typename?: 'Mutation', createDevice: { __typename?: 'Device', id: string, name: string } };
