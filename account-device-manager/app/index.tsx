@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { gql, useQuery } from '@apollo/client';
+import { GetAccountsQuery } from '@/graphql/gateway/generated/schema-types';
 
 const GET_ACCOUNTS = gql`
   query GetAccounts {
@@ -19,7 +20,7 @@ const GET_ACCOUNTS = gql`
 `;
 
 export default function Index() {
-  const { loading, error, data } = useQuery(GET_ACCOUNTS);
+  const { loading, error, data } = useQuery<GetAccountsQuery>(GET_ACCOUNTS);
 
   if (loading) {
     return (
@@ -44,7 +45,7 @@ export default function Index() {
     <View style={styles.container}>
       <Text style={styles.title}>Accounts</Text>
       <FlatList
-        data={data.accounts}
+        data={data?.accounts}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.accountCard}>
