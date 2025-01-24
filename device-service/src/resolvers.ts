@@ -18,15 +18,24 @@ const devices: Device[] = [
 export const resolvers = {
   Query: {
     devices: () => devices,
-    device: (_: any, { id }: { id: string }) => devices.find((device) => device.id === id),
-    devicesByAccountId: (_: any, { accountId }: { accountId: string }) =>
-      devices.filter((device) => device.accountId === accountId),
+    device: (_: unknown, { id }: { id: string }) => {
+      return devices.find((device) => device.id === id) || null;
+    },
   },
   Mutation: {
     createDevice: (_: any, { name, accountId }: Device) => {
       const device = { id: uuidv4(), name, accountId };
       devices.push(device);
       return device;
+    },
+  },
+  Account: {
+    devices: (account: { id: string }) =>
+      devices.filter((device) => device.accountId === account.id),
+  },
+  Device: {
+    __resolveReference(device: { id: string }) {
+      return devices.find((d) => d.id === device.id) || null;
     },
   },
 };
