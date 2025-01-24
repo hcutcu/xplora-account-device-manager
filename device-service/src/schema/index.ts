@@ -7,10 +7,14 @@ export const typeDefs = gql`
     accountId: ID!
   }
 
+  extend type Account @key(fields: "id") {
+    id: ID! @external
+    devices: [Device!]!
+  }
+
   type Query {
     devices: [Device!]!
     device(id: ID!): Device
-    devicesByAccountId(accountId: ID!): [Device!]!
   }
 
   type Mutation {

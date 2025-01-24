@@ -28,4 +28,9 @@ export const resolvers = {
       return account;
     },
   },
+  Account: {
+    __resolveReference(account: Account) {
+      return accounts.find((acc) => acc.id === account.id) || null;
+    },
+  },
 };
