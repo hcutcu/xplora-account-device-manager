@@ -8,6 +8,7 @@ import {
   Button,
   TouchableOpacity,
   Alert,
+  Platform,
 } from 'react-native';
 import { gql, useQuery, useMutation } from '@apollo/client';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -55,24 +56,32 @@ export default function Accounts() {
   );
 
   const handleDeleteAccount = (accountId: string) => {
-    Alert.alert(
-      'Confirm Deletion',
-      'Are you sure? All related devices will be deleted as well.',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'OK',
-          onPress: async () => {
-            await deleteDevicesByAccountId({ variables: { accountId } });
-            await deleteAccount({ variables: { id: accountId } });
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm('Are you sure? All related devices will be deleted as well.');
+      if (confirmed) {
+        deleteDevicesByAccountId({ variables: { accountId } });
+        deleteAccount({ variables: { id: accountId } });
+      }
+    } else {
+      Alert.alert(
+        'Confirm Deletion',
+        'Are you sure? All related devices will be deleted as well.',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
           },
-        },
-      ],
-      { cancelable: false }
-    );
+          {
+            text: 'OK',
+            onPress: async () => {
+              await deleteDevicesByAccountId({ variables: { accountId } });
+              await deleteAccount({ variables: { id: accountId } });
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
   };
 
   if (loading) {
