@@ -1,7 +1,7 @@
 import { Account } from './types';
 import { v4 as uuidv4 } from 'uuid';
 
-//TODO: move this later
+//TODO: decide later if default accounts should be removed
 const accounts: Account[] = [
   {
     id: '1',
@@ -18,6 +18,8 @@ const accounts: Account[] = [
 export const resolvers = {
   Query: {
     accounts: () => accounts,
+    account: (_: any, { id }: { id: string }) =>
+      accounts.find((account) => account.id === id),
   },
   Mutation: {
     createAccount: (_: any, { name, email }: Account) => {
