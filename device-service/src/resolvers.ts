@@ -1,17 +1,18 @@
 import { Device } from './types';
 import { v4 as uuidv4 } from 'uuid';
 
-//TODO: Decide later if default devices should be removed
 let devices: Device[] = [
   {
     id: '1',
     name: 'iPad Pro',
     accountId: '1',
+    link: 'https://www.apple.com/ipad-pro/',
   },
   {
     id: '2',
     name: 'MacBook Pro',
     accountId: '2',
+    link: 'https://www.apple.com/macbook-pro/',
   },
 ];
 
@@ -23,8 +24,8 @@ export const resolvers = {
     },
   },
   Mutation: {
-    createDevice: (_: any, { name, accountId }: Device) => {
-      const device = { id: uuidv4(), name, accountId };
+    createDevice: (_: any, { name, accountId, link }: Device) => {
+      const device = { id: uuidv4(), name, accountId, link };
       devices.push(device);
       return device;
     },
@@ -35,11 +36,16 @@ export const resolvers = {
       }
       return null;
     },
-    deleteDevicesByAccountId: (_: any, { accountId }: { accountId : string }) => {
-      const deletedDevices = devices.filter((device) => device.accountId === accountId);
+    deleteDevicesByAccountId: (
+      _: any,
+      { accountId }: { accountId: string }
+    ) => {
+      const deletedDevices = devices.filter(
+        (device) => device.accountId === accountId
+      );
       devices = devices.filter((device) => device.accountId !== accountId);
       return deletedDevices;
-    },   
+    },
   },
   Account: {
     devices: (account: { id: string }) =>
