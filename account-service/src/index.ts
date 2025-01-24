@@ -9,6 +9,6 @@ const server = new ApolloServer({
   schema: buildSubgraphSchema([schemaDefinition]),
 });
 
-server.listen({ port: 4000 }).then(({ url }) => {
+server.listen({ port: 4001 }).then(({ url }) => {
   console.log(`Account Server ready at ${url}`);
 });
