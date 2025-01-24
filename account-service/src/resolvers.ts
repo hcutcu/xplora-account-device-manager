@@ -27,6 +27,13 @@ export const resolvers = {
       accounts.push(account);
       return account;
     },
+    deleteAccount: (_: any, { id }: { id: string }) => {
+      const index = accounts.findIndex((account) => account.id === id);
+      if (index !== -1) {
+        return accounts.splice(index, 1)[0];
+      }
+      return null;
+    },
   },
   Account: {
     __resolveReference(account: Account) {
