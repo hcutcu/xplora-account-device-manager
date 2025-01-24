@@ -1,0 +1,21 @@
+services:
+  account-service:
+    build:
+      context: ./account-service
+    ports:
+      - '4001:4001'
+
+  device-service:
+    build:
+      context: ./device-service
+    ports:
+      - '4002:4002'
+
+  federation-service:
+    build:
+      context: ./federation-service
+    ports:
+      - '4000:4000'
+    depends_on:
+      - account-service
+      - device-service
