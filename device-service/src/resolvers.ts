@@ -2,7 +2,7 @@ import { Device } from './types';
 import { v4 as uuidv4 } from 'uuid';
 
 //TODO: Decide later if default devices should be removed
-const devices: Device[] = [
+let devices: Device[] = [
   {
     id: '1',
     name: 'iPad Pro',
@@ -35,6 +35,11 @@ export const resolvers = {
       }
       return null;
     },
+    deleteDevicesByAccountId: (_: any, { accountId }: { accountId : string }) => {
+      const deletedDevices = devices.filter((device) => device.accountId === accountId);
+      devices = devices.filter((device) => device.accountId !== accountId);
+      return deletedDevices;
+    },   
   },
   Account: {
     devices: (account: { id: string }) =>

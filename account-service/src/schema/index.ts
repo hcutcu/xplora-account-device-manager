@@ -14,5 +14,6 @@ export const typeDefs = gql`
 
   type Mutation {
     createAccount(name: String!, email: String!): Account!
+    deleteAccount(id: ID!): Account
   }
 `;

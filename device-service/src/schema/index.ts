@@ -20,5 +20,6 @@ export const typeDefs = gql`
   type Mutation {
     createDevice(name: String!, accountId: ID!): Device!
     deleteDevice(id: ID!): Device
+    deleteDevicesByAccountId(accountId: ID!): [Device!]!
   }
 `;

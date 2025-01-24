@@ -7,10 +7,11 @@ import {
   ActivityIndicator,
   Button,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
-import { gql, useQuery } from '@apollo/client';
+import { gql, useQuery, useMutation } from '@apollo/client';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { GetAccountsQuery } from '@/graphql/gateway/generated/schema-types';
+import { GetAccountsQuery, DeleteAccountMutation, DeleteDevicesByAccountIdMutation } from '@/graphql/gateway/generated/schema-types';
 import { NavigationProp } from '../types/navigation';
 
 const GET_ACCOUNTS = gql`
@@ -23,15 +24,56 @@ const GET_ACCOUNTS = gql`
   }
 `;
 
+const DELETE_ACCOUNT = gql`
+  mutation DeleteAccount($id: ID!) {
+    deleteAccount(id: $id) {
+      id
+    }
+  }
+`;
+
+const DELETE_DEVICES_BY_ACCOUNT_ID = gql`
+  mutation DeleteDevicesByAccountId($accountId: ID!) {
+    deleteDevicesByAccountId(accountId: $accountId) {
+      id
+    }
+  }
+`;
+
 export default function Accounts() {
   const navigation = useNavigation<NavigationProp>();
   const { loading, error, data, refetch } = useQuery<GetAccountsQuery>(GET_ACCOUNTS);
+  const [deleteAccount] = useMutation<DeleteAccountMutation>(DELETE_ACCOUNT, {
+    onCompleted: () => refetch(),
+  });
+  const [deleteDevicesByAccountId] = useMutation<DeleteDevicesByAccountIdMutation>(DELETE_DEVICES_BY_ACCOUNT_ID);
 
   useFocusEffect(
     useCallback(() => {
       refetch();
     }, [refetch])
   );
+
+  const handleDeleteAccount = (accountId: string) => {
+    Alert.alert(
+      'Confirm Deletion',
+      'Are you sure? All related devices will be deleted as well.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: async () => {
+            await deleteDevicesByAccountId({ variables: { accountId } });
+            await deleteAccount({ variables: { id: accountId } });
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
 
   if (loading) {
     return (
@@ -58,13 +100,21 @@ export default function Accounts() {
         data={data?.accounts}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.accountCard}
-            onPress={() => navigation.navigate('AccountDevices', { accountId: item.id })}
-          >
-            <Text style={styles.accountName}>{item.name}</Text>
-            <Text style={styles.accountEmail}>{item.email}</Text>
-          </TouchableOpacity>
+          <View style={styles.accountCard}>
+            <TouchableOpacity
+              style={styles.accountInfo}
+              onPress={() => navigation.navigate('AccountDevices', { accountId: item.id })}
+            >
+              <Text style={styles.accountName}>{item.name}</Text>
+              <Text style={styles.accountEmail}>{item.email}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => handleDeleteAccount(item.id)}
+            >
+              <Text style={styles.deleteButtonText}>Delete</Text>
+            </TouchableOpacity>
+          </View>
         )}
         ListEmptyComponent={<Text style={styles.noAccounts}>No accounts found</Text>}
         contentContainerStyle={styles.listContent}
@@ -85,11 +135,6 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#f5f5f5',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
   accountCard: {
     backgroundColor: '#fff',
     padding: 15,
@@ -99,6 +144,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 2,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  accountInfo: {
+    flex: 1,
   },
   accountName: {
     fontSize: 18,
@@ -107,6 +158,15 @@ const styles = StyleSheet.create({
   accountEmail: {
     fontSize: 14,
     color: '#666',
+  },
+  deleteButton: {
+    backgroundColor: '#ff4d4d',
+    padding: 10,
+    borderRadius: 5,
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   centered: {
     flex: 1,
