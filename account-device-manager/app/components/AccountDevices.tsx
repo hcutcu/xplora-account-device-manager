@@ -7,6 +7,8 @@ import {
   ActivityIndicator,
   Button,
   TouchableOpacity,
+  Alert,
+  Linking,
 } from 'react-native';
 import { gql, useQuery, useMutation } from '@apollo/client';
 import {
@@ -24,6 +26,7 @@ const GET_ACCOUNT_DEVICES = gql`
       devices {
         id
         name
+        link
       }
     }
   }
@@ -88,6 +91,10 @@ export default function AccountDevices() {
     deleteDevice({ variables: { id } });
   };
 
+  const handleOpenLink = (link: string) => {
+    Linking.openURL(link);
+  };
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -95,7 +102,16 @@ export default function AccountDevices() {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.deviceCard}>
-            <Text style={styles.deviceName}>{item.name}</Text>
+            <View style={styles.deviceInfo}>
+              <Text style={styles.deviceName}>{item.name}</Text>
+              {item.link ? (
+                <TouchableOpacity onPress={() => handleOpenLink(item.link!)}>
+                  <Text style={styles.deviceLink}>{item.link}</Text>
+                </TouchableOpacity>
+              ) : (
+                <Text style={styles.noLink}>No link</Text>
+              )}
+            </View>
             <TouchableOpacity
               style={styles.deleteButton}
               onPress={() => handleDeleteDevice(item.id)}
@@ -136,9 +152,23 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  deviceInfo: {
+    flex: 1,
+  },
   deviceName: {
     fontSize: 18,
     fontWeight: '600',
+  },
+  deviceLink: {
+    fontSize: 14,
+    color: '#1e90ff',
+    textDecorationLine: 'underline',
+    marginTop: 5,
+  },
+  noLink: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 5,
   },
   deleteButton: {
     backgroundColor: '#ff4d4d',

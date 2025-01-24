@@ -1,7 +1,6 @@
 import { Account } from './types';
 import { v4 as uuidv4 } from 'uuid';
 
-//TODO: decide later if default accounts should be removed
 const accounts: Account[] = [
   {
     id: '1',

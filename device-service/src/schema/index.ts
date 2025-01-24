@@ -5,6 +5,7 @@ export const typeDefs = gql`
     id: ID!
     name: String!
     accountId: ID!
+    link: String
   }
 
   extend type Account @key(fields: "id") {
@@ -18,7 +19,7 @@ export const typeDefs = gql`
   }
 
   type Mutation {
-    createDevice(name: String!, accountId: ID!): Device!
+    createDevice(name: String!, accountId: ID!, link: String): Device!
     deleteDevice(id: ID!): Device
     deleteDevicesByAccountId(accountId: ID!): [Device!]!
   }

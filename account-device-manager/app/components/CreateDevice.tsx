@@ -1,16 +1,16 @@
-// filepath: /Users/hasancutcu/Code/xplora-account-device-manager/account-device-manager/app/components/CreateDevice.tsx
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { gql, useMutation } from '@apollo/client';
-import { CreateDeviceMutation } from '@/graphql/gateway/generated/schema-types';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NavigationProp } from '../types/navigation';
+import { CreateDeviceMutation } from '@/graphql/gateway/generated/schema-types';
 
 const CREATE_DEVICE = gql`
-  mutation CreateDevice($name: String!, $accountId: ID!) {
-    createDevice(name: $name, accountId: $accountId) {
+  mutation CreateDevice($name: String!, $accountId: ID!, $link: String) {
+    createDevice(name: $name, accountId: $accountId, link: $link) {
       id
       name
+      link
     }
   }
 `;
@@ -25,6 +25,7 @@ export default function CreateDevice() {
   const navigation = useNavigation<NavigationProp>();
   const { accountId } = route.params;
   const [name, setName] = useState('');
+  const [link, setLink] = useState('');
   const [createDevice, { loading, error }] = useMutation<CreateDeviceMutation>(
     CREATE_DEVICE,
     {
@@ -33,7 +34,7 @@ export default function CreateDevice() {
   );
 
   const handleCreateDevice = () => {
-    createDevice({ variables: { name, accountId } });
+    createDevice({ variables: { name, accountId, link } });
   };
 
   return (
@@ -43,6 +44,12 @@ export default function CreateDevice() {
         placeholder="Device Name"
         value={name}
         onChangeText={setName}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Device Link"
+        value={link}
+        onChangeText={setLink}
       />
       <Button title="Create Device" onPress={handleCreateDevice} />
       {loading && <Text>Creating device...</Text>}
@@ -56,11 +63,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#f5f5f5',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
   },
   input: {
     height: 40,
