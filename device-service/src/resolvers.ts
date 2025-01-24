@@ -28,6 +28,13 @@ export const resolvers = {
       devices.push(device);
       return device;
     },
+    deleteDevice: (_: any, { id }: { id: string }) => {
+      const index = devices.findIndex((device) => device.id === id);
+      if (index !== -1) {
+        return devices.splice(index, 1)[0];
+      }
+      return null;
+    },
   },
   Account: {
     devices: (account: { id: string }) =>

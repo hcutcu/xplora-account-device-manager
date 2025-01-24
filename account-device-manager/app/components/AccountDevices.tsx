@@ -6,8 +6,9 @@ import {
   FlatList,
   ActivityIndicator,
   Button,
+  TouchableOpacity,
 } from 'react-native';
-import { gql, useQuery } from '@apollo/client';
+import { gql, useQuery, useMutation } from '@apollo/client';
 import {
   RouteProp,
   useRoute,
@@ -15,7 +16,7 @@ import {
   useFocusEffect,
 } from '@react-navigation/native';
 import { NavigationProp } from '../types/navigation';
-import { GetAccountDevicesQuery } from '@/graphql/gateway/generated/schema-types';
+import { GetAccountDevicesQuery, DeleteDeviceMutation } from '@/graphql/gateway/generated/schema-types';
 
 const GET_ACCOUNT_DEVICES = gql`
   query GetAccountDevices($accountId: ID!) {
@@ -24,6 +25,14 @@ const GET_ACCOUNT_DEVICES = gql`
         id
         name
       }
+    }
+  }
+`;
+
+const DELETE_DEVICE = gql`
+  mutation DeleteDevice($id: ID!) {
+    deleteDevice(id: $id) {
+      id
     }
   }
 `;
@@ -43,6 +52,10 @@ export default function AccountDevices() {
       variables: { accountId },
     }
   );
+
+  const [deleteDevice] = useMutation<DeleteDeviceMutation>(DELETE_DEVICE, {
+    onCompleted: () => refetch(),
+  });
 
   useFocusEffect(
     useCallback(() => {
@@ -71,6 +84,10 @@ export default function AccountDevices() {
 
   const devices = data?.account?.devices;
 
+  const handleDeleteDevice = (id: string) => {
+    deleteDevice({ variables: { id } });
+  };
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -79,6 +96,12 @@ export default function AccountDevices() {
         renderItem={({ item }) => (
           <View style={styles.deviceCard}>
             <Text style={styles.deviceName}>{item.name}</Text>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => handleDeleteDevice(item.id)}
+            >
+              <Text style={styles.deleteButtonText}>Delete</Text>
+            </TouchableOpacity>
           </View>
         )}
         ListEmptyComponent={<Text style={styles.noDevices}>No devices found</Text>}
@@ -100,11 +123,6 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#f5f5f5',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
   deviceCard: {
     backgroundColor: '#fff',
     padding: 15,
@@ -114,10 +132,22 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 2,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   deviceName: {
     fontSize: 18,
     fontWeight: '600',
+  },
+  deleteButton: {
+    backgroundColor: '#ff4d4d',
+    padding: 10,
+    borderRadius: 5,
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   centered: {
     flex: 1,
@@ -136,7 +166,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     flexGrow: 1,
-    paddingBottom: 80, 
+    paddingBottom: 80, // Space for the button
   },
   buttonContainer: {
     position: 'absolute',

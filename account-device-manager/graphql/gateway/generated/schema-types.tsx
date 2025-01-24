@@ -33,6 +33,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   createAccount: Account;
   createDevice: Device;
+  deleteDevice?: Maybe<Device>;
 };
 
 
@@ -45,6 +46,11 @@ export type MutationCreateAccountArgs = {
 export type MutationCreateDeviceArgs = {
   accountId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteDeviceArgs = {
+  id: Scalars['ID']['input'];
 };
 
 export type Query = {
@@ -71,6 +77,13 @@ export type GetAccountDevicesQueryVariables = Exact<{
 
 
 export type GetAccountDevicesQuery = { __typename?: 'Query', account?: { __typename?: 'Account', devices: Array<{ __typename?: 'Device', id: string, name: string }> } | null };
+
+export type DeleteDeviceMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteDeviceMutation = { __typename?: 'Mutation', deleteDevice?: { __typename?: 'Device', id: string } | null };
 
 export type GetAccountsQueryVariables = Exact<{ [key: string]: never; }>;
 
