@@ -10,44 +10,21 @@ import {
   Alert,
   Platform,
 } from 'react-native';
-import { gql, useQuery, useMutation } from '@apollo/client';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { GetAccountsQuery, DeleteAccountMutation, DeleteDevicesByAccountIdMutation } from '@/graphql/gateway/generated/schema-types';
 import { NavigationProp } from '../types/navigation';
-
-const GET_ACCOUNTS = gql`
-  query GetAccounts {
-    accounts {
-      id
-      name
-      email
-    }
-  }
-`;
-
-const DELETE_ACCOUNT = gql`
-  mutation DeleteAccount($id: ID!) {
-    deleteAccount(id: $id) {
-      id
-    }
-  }
-`;
-
-const DELETE_DEVICES_BY_ACCOUNT_ID = gql`
-  mutation DeleteDevicesByAccountId($accountId: ID!) {
-    deleteDevicesByAccountId(accountId: $accountId) {
-      id
-    }
-  }
-`;
+import { useGetAccountsQuery } from '@/graphql/gateway/hooks/getAccounts.hooks';
+import { useDeleteAccountMutation } from '@/graphql/gateway/hooks/deleteAccount.hooks';
+import { useDeleteDevicesByAccountIdMutation } from '@/graphql/gateway/hooks/deleteDevicesByAccountId.hooks';
 
 export default function Accounts() {
   const navigation = useNavigation<NavigationProp>();
-  const { loading, error, data, refetch } = useQuery<GetAccountsQuery>(GET_ACCOUNTS);
-  const [deleteAccount] = useMutation<DeleteAccountMutation>(DELETE_ACCOUNT, {
+  const { loading, error, data, refetch } = useGetAccountsQuery();
+
+  const [deleteAccount] = useDeleteAccountMutation({
     onCompleted: () => refetch(),
   });
-  const [deleteDevicesByAccountId] = useMutation<DeleteDevicesByAccountIdMutation>(DELETE_DEVICES_BY_ACCOUNT_ID);
+
+  const [deleteDevicesByAccountId] = useDeleteDevicesByAccountIdMutation();
 
   useFocusEffect(
     useCallback(() => {
@@ -57,7 +34,9 @@ export default function Accounts() {
 
   const handleDeleteAccount = (accountId: string) => {
     if (Platform.OS === 'web') {
-      const confirmed = window.confirm('Are you sure? All related devices will be deleted as well.');
+      const confirmed = window.confirm(
+        'Are you sure? All related devices will be deleted as well.'
+      );
       if (confirmed) {
         deleteDevicesByAccountId({ variables: { accountId } });
         deleteAccount({ variables: { id: accountId } });
@@ -112,7 +91,9 @@ export default function Accounts() {
           <View style={styles.accountCard}>
             <TouchableOpacity
               style={styles.accountInfo}
-              onPress={() => navigation.navigate('AccountDevices', { accountId: item.id })}
+              onPress={() =>
+                navigation.navigate('AccountDevices', { accountId: item.id })
+              }
             >
               <Text style={styles.accountName}>{item.name}</Text>
               <Text style={styles.accountEmail}>{item.email}</Text>
@@ -125,7 +106,9 @@ export default function Accounts() {
             </TouchableOpacity>
           </View>
         )}
-        ListEmptyComponent={<Text style={styles.noAccounts}>No accounts found</Text>}
+        ListEmptyComponent={
+          <Text style={styles.noAccounts}>No accounts found</Text>
+        }
         contentContainerStyle={styles.listContent}
       />
       <View style={styles.buttonContainer}>

@@ -1,0 +1,7 @@
+mutation CreateDevice($name: String!, $accountId: ID!, $link: String) {
+  createDevice(name: $name, accountId: $accountId, link: $link) {
+    id
+    name
+    link
+  }
+}

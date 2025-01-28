@@ -7,10 +7,8 @@ import {
   ActivityIndicator,
   Button,
   TouchableOpacity,
-  Alert,
   Linking,
 } from 'react-native';
-import { gql, useQuery, useMutation } from '@apollo/client';
 import {
   RouteProp,
   useRoute,
@@ -18,27 +16,8 @@ import {
   useFocusEffect,
 } from '@react-navigation/native';
 import { NavigationProp } from '../types/navigation';
-import { GetAccountDevicesQuery, DeleteDeviceMutation } from '@/graphql/gateway/generated/schema-types';
-
-const GET_ACCOUNT_DEVICES = gql`
-  query GetAccountDevices($accountId: ID!) {
-    account(id: $accountId) {
-      devices {
-        id
-        name
-        link
-      }
-    }
-  }
-`;
-
-const DELETE_DEVICE = gql`
-  mutation DeleteDevice($id: ID!) {
-    deleteDevice(id: $id) {
-      id
-    }
-  }
-`;
+import { useGetAccountDevicesQuery } from '@/graphql/gateway/hooks/getAccountDevices.hooks';
+import { useDeleteDeviceMutation } from '@/graphql/gateway/hooks/deleteDevice.hooks';
 
 type AccountDevicesRouteProp = RouteProp<
   { AccountDevices: { accountId: string } },
@@ -49,14 +28,12 @@ export default function AccountDevices() {
   const route = useRoute<AccountDevicesRouteProp>();
   const navigation = useNavigation<NavigationProp>();
   const { accountId } = route.params;
-  const { loading, error, data, refetch } = useQuery<GetAccountDevicesQuery>(
-    GET_ACCOUNT_DEVICES,
-    {
-      variables: { accountId },
-    }
-  );
 
-  const [deleteDevice] = useMutation<DeleteDeviceMutation>(DELETE_DEVICE, {
+  const { loading, error, data, refetch } = useGetAccountDevicesQuery({
+    variables: { accountId },
+  });
+
+  const [deleteDevice] = useDeleteDeviceMutation({
     onCompleted: () => refetch(),
   });
 
@@ -120,7 +97,9 @@ export default function AccountDevices() {
             </TouchableOpacity>
           </View>
         )}
-        ListEmptyComponent={<Text style={styles.noDevices}>No devices found</Text>}
+        ListEmptyComponent={
+          <Text style={styles.noDevices}>No devices found</Text>
+        }
         contentContainerStyle={styles.listContent}
       />
       <View style={styles.buttonContainer}>

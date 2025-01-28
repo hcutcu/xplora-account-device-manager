@@ -1,0 +1,5 @@
+mutation DeleteDevicesByAccountId($accountId: ID!) {
+  deleteDevicesByAccountId(accountId: $accountId) {
+    id
+  }
+}
