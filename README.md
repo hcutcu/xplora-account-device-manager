@@ -135,6 +135,16 @@ The federated GraphQL API is exposed at `http://localhost:4000/graphql`. You can
   }
   ```
 
+### Generating Types and Hooks
+
+To update schema types and generate TypeScript types and React hooks, run the following command:
+
+```sh
+npm run generate
+```
+Everytime you add a new query or mutation in `queries` folder or if the schema changed you need to run `npm run generate` to update the types and hooks
+
+
 ## Documentation
 
 ### Account Service
