@@ -1,19 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import { gql, useMutation } from '@apollo/client';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NavigationProp } from '../types/navigation';
-import { CreateDeviceMutation } from '@/graphql/gateway/generated/schema-types';
-
-const CREATE_DEVICE = gql`
-  mutation CreateDevice($name: String!, $accountId: ID!, $link: String) {
-    createDevice(name: $name, accountId: $accountId, link: $link) {
-      id
-      name
-      link
-    }
-  }
-`;
+import { useCreateDeviceMutation } from '@/graphql/gateway/hooks/createDevice.hooks';
 
 type CreateDeviceRouteProp = RouteProp<
   { CreateDevice: { accountId: string } },
@@ -24,14 +13,13 @@ export default function CreateDevice() {
   const route = useRoute<CreateDeviceRouteProp>();
   const navigation = useNavigation<NavigationProp>();
   const { accountId } = route.params;
+
   const [name, setName] = useState('');
   const [link, setLink] = useState('');
-  const [createDevice, { loading, error }] = useMutation<CreateDeviceMutation>(
-    CREATE_DEVICE,
-    {
-      onCompleted: () => navigation.goBack(),
-    }
-  );
+
+  const [createDevice, { loading, error }] = useCreateDeviceMutation({
+    onCompleted: () => navigation.goBack(),
+  });
 
   const handleCreateDevice = () => {
     createDevice({ variables: { name, accountId, link } });

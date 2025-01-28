@@ -1,0 +1,9 @@
+query GetAccountDevices($accountId: ID!) {
+  account(id: $accountId) {
+    devices {
+      id
+      name
+      link
+    }
+  }
+}

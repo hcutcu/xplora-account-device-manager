@@ -1,30 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import { gql, useMutation } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
-import {
-  CreateAccountMutation,
-  CreateAccountMutationVariables,
-} from '@/graphql/gateway/generated/schema-types';
-
-const CREATE_ACCOUNT = gql`
-  mutation CreateAccount($name: String!, $email: String!) {
-    createAccount(name: $name, email: $email) {
-      id
-      name
-      email
-    }
-  }
-`;
+import { useCreateAccountMutation } from '@/graphql/gateway/hooks/createAccount.hooks';
 
 export default function CreateAccount() {
   const navigation = useNavigation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [createAccount, { loading, error }] =
-    useMutation<CreateAccountMutation>(CREATE_ACCOUNT, {
-      onCompleted: () => navigation.goBack(),
-    });
+
+  const [createAccount, { loading, error }] = useCreateAccountMutation({
+    onCompleted: () => navigation.goBack(),
+  });
 
   const handleCreateAccount = () => {
     createAccount({ variables: { name, email } });
